@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "ips12345",
-    "database": "database_development",
+    "password": "sweety_9510",
+    "database": "jwt_development",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
