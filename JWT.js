@@ -319,19 +319,38 @@ app.post("/add", async (req, res) => {
   });
 });
 
+// app.post("/Register", async (req, res) => {
+//   const { firstName, lastName, email, password } = req.body;
+//   var data = { firstName, lastName, email, password };
+//   console.log(data);
+//   if (!firstName || !lastName || !email || !password) {
+//     res.status(401).send("all filds are required ");
+//   } else {
+//     const user = await User.findOne({ where: { email: email } });
+//     if (user) {
+//       res.send(" user already exits");
+//     } else {
+//       var EncPass = await bcrypt.hash(password, 10);
+
+//       await User.create({ firstName, lastName, email, password: EncPass });
+//       res.status(200).send("Registered succesfully");
+//     }
+//   }
+// });
+
 app.post("/Register", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   var data = { firstName, lastName, email, password };
-  console.log(data);
+  console.log(data)
   if (!firstName || !lastName || !email || !password) {
     res.status(401).send("all filds are required ");
   } else {
     const user = await User.findOne({ where: { email: email } });
     if (user) {
       res.send(" user already exits");
-    } else {
+    }
+    else {
       var EncPass = await bcrypt.hash(password, 10);
-
       await User.create({ firstName, lastName, email, password: EncPass });
       res.status(200).send("Registered succesfully");
     }
@@ -402,32 +421,57 @@ function verifyToken(req, res, next) {
   }
 }
 
+// app.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+//   var data = { email, password };
+//   console.log(">>>>>>>>>", data);
+//   if (!email || !password) {
+//     res.status(401).send("all filds are required ");
+//   } 
+//   else {
+//     const user = await User.findOne({ where: { email: email } });
+//     if (user === null) {
+//       res.send("Email Does not exist");
+//     }
+//     if (user) {
+//       bcrypt.compare(password, user.password, (err, result) => {
+//         if (err) {
+//           console.error(err);
+//           return;
+//         }
+//         if (result) {
+//           jwt.sign({ user }, secretKey, (err, token) => {
+//             res.send({ msg: "login successful", token: token });
+//           });
+//         } else {
+//           return res.json({ Password: "password was incorect" });
+//         }
+//       });
+//     }
+//   }
+// });
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  var data = { email, password };
-  console.log(">>>>>>>>>", data);
+  // const data = { email, password };
+  // console.log(data)
   if (!email || !password) {
     res.status(401).send("all filds are required ");
-  } 
+  }
   else {
     const user = await User.findOne({ where: { email: email } });
-    if (user === null) {
-      res.send("Email Does not exist");
-    }
     if (user) {
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        if (result) {
-          jwt.sign({ user }, secretKey, (err, token) => {
-            res.send({ msg: "login successful", token: token });
-          });
-        } else {
-          return res.json({ Password: "password was incorect" });
-        }
-      });
+      let check = await bcrypt.compare(password, user.password);
+      if (check == true) {
+        console.log("login successful");
+        jwt.sign({ user }, secretKey, { expiresIn: '300s' }, (err, token) => {
+          res.json({
+            token
+          })
+        })
+      } else {
+        return res.status(401).json({ Password: " password  incorrect" });
+      }
     }
   }
 });
